@@ -11,7 +11,15 @@ public class Main {
     static String fileName = "render.ppm";
     static String path = "C:\\Users\\dldemo\\Desktop\\Renders\\";
 
+    static double focalLength = 1.0;
+    static double veiwportHeight = 2.0;
+    static double veiwPortWidth = veiwportHeight * (((double)imageWidth) / ((double)imageHeight));
+
     public static void main(String[] args) {
+        //camera
+        Vector3 origin = new Vector3(0,0,0);
+
+
         //create file
         try {
             File image = new File(path+fileName);
@@ -25,7 +33,7 @@ public class Main {
             e.printStackTrace();
         }
 
-        //writeTofile
+        //write To file
         try {
             FileWriter writer = new FileWriter(path+fileName);
 
@@ -41,6 +49,7 @@ public class Main {
                     writer.write(pixelColor + "\n");
                 }
             }
+
             writer.close();
             System.out.println("Successfully wrote to the file.");
         } catch (IOException e) {
