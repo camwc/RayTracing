@@ -18,20 +18,11 @@ public class Main {
     public static void main(String[] args) {
         //camera
         Vector3 origin = new Vector3(0,0,0);
-
-
-        //create file
-        try {
-            File image = new File(path+fileName);
-            if (image.createNewFile()) {
-                System.out.println("File created: " + image.getName());
-            } else {
-                System.out.println("File already exists.");
-            }
-        } catch (IOException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
-        }
+        Vector3 horizontal = new Vector3(veiwPortWidth, 0, 0);
+        Vector3 vertical = new Vector3(0, veiwportHeight, 0);
+        Vector3 lowerLeftCorner = origin.subtract(horizontal.divide(2))
+                                        .subtract(vertical.divide(2))
+                                        .subtract(new Vector3(0, 0, focalLength));
 
         //write To file
         try {
@@ -41,14 +32,22 @@ public class Main {
             writer.write("P3\n"+imageWidth+" "+imageHeight+"\n"+255+"\n");
 
 
+            //Render image
             for(int y = 0; y < imageHeight; y++){
                 for(int x = 0; x < imageWidth; x++){
+                    double u = ((double)x) / (imageWidth-1);
+                    double v = ((double)y) / (imageHeight-1);
+
+                    Ray r = new Ray(origin, lowerLeftCorner.add(horizontal.multiply(u))
+                                                            .add(vertical.multiply(v))
+                                                            .subtract(origin));
 
                     Vector3 pixelColor = new Vector3(x,y,1);
 
                     writer.write(pixelColor + "\n");
                 }
             }
+
 
             writer.close();
             System.out.println("Successfully wrote to the file.");
