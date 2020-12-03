@@ -5,8 +5,8 @@ import java.io.IOException;
 
 public class Main {
 
-    static int imageWidth = 200;
-    static int imageHeight = 200;
+    static int imageWidth = 600;
+    static int imageHeight = 400;
 
     static String fileName = "render.ppm";
     static String path = "C:\\Users\\dldemo\\Desktop\\Renders\\";
@@ -14,6 +14,36 @@ public class Main {
     static double focalLength = 1.0;
     static double veiwportHeight = 2.0;
     static double veiwPortWidth = veiwportHeight * (((double)imageWidth) / ((double)imageHeight));
+
+    //returns ray length of sphere intersection
+    static double hitSphere(Vector3 center, double radius, Ray r){
+        Vector3 oc = r.origin.subtract(center);
+        double a = r.direction.dot(r.direction);
+        double b = 2.0 * oc.dot(r.direction);
+        double c = oc.dot(oc) - radius*radius;
+        double discriminant = b*b - 4*a*c;
+        if (discriminant < 0) {
+            return -1.0;
+        } else {
+            return (-b - Math.sqrt(discriminant) ) / (2.0*a);
+        }
+    }
+
+    //Color of rays cast
+    static Vector3 rayColor(Ray r) {
+        double t = hitSphere(new Vector3(0, 0, -1),0.5, r);
+        if(t>0){
+            Vector3 normal = r.at(t).subtract(new Vector3(0, 0, -1)).unitVector();
+            return new Vector3(normal.x+1, normal.y+1, normal.z+1).multiply(0.5);
+        }
+
+
+        //Background sky
+        Vector3 unitDirection = r.direction.unitVector();
+        t = 0.5*(unitDirection.y + 1.0);
+        return (new Vector3(1.0, 1.0, 1.0).multiply(1.0-t)).add(new Vector3(0.5, 0.7, 1.0).multiply(t));
+    }
+
 
     public static void main(String[] args) {
         //camera
@@ -33,7 +63,7 @@ public class Main {
 
 
             //Render image
-            for(int y = 0; y < imageHeight; y++){
+            for(int y = imageHeight-1; y >= 0; y--){
                 for(int x = 0; x < imageWidth; x++){
                     double u = ((double)x) / (imageWidth-1);
                     double v = ((double)y) / (imageHeight-1);
@@ -42,9 +72,9 @@ public class Main {
                                                             .add(vertical.multiply(v))
                                                             .subtract(origin));
 
-                    Vector3 pixelColor = new Vector3(x,y,1);
+                    Vector3 pixelColor = rayColor(r);
 
-                    writer.write(pixelColor + "\n");
+                    writer.write(pixelColor.color() + "\n");
                 }
             }
 

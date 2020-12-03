@@ -46,7 +46,11 @@ public class Vector3 {
     }
 
     public String toString(){
-        return x + " " + y + " " + z;
+        return x + ", " + y + ", " + z;
+    }
+
+    public String color(){
+        return ((int)(x*255.999)) + " " + ((int)(y*255.999)) + " " + ((int)(z*255.999));
     }
 
 }
