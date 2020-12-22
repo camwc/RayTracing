@@ -5,54 +5,47 @@ import java.io.IOException;
 
 public class Main {
 
-    static int imageWidth = 600;
-    static int imageHeight = 400;
-
-    static String fileName = "render.ppm";
-    static String path = "C:\\Users\\dldemo\\Desktop\\Renders\\";
-
-    static double focalLength = 1.0;
-    static double veiwportHeight = 2.0;
-    static double veiwPortWidth = veiwportHeight * (((double)imageWidth) / ((double)imageHeight));
-
-    //returns ray length of sphere intersection
-    static double hitSphere(Vector3 center, double radius, Ray r){
-        Vector3 oc = r.origin.subtract(center);
-        double a = r.direction.dot(r.direction);
-        double b = 2.0 * oc.dot(r.direction);
-        double c = oc.dot(oc) - radius*radius;
-        double discriminant = b*b - 4*a*c;
-        if (discriminant < 0) {
-            return -1.0;
-        } else {
-            return (-b - Math.sqrt(discriminant) ) / (2.0*a);
-        }
-    }
-
     //Color of rays cast
-    static Vector3 rayColor(Ray r) {
-        double t = hitSphere(new Vector3(0, 0, -1),0.5, r);
-        if(t>0){
-            Vector3 normal = r.at(t).subtract(new Vector3(0, 0, -1)).unitVector();
-            return new Vector3(normal.x+1, normal.y+1, normal.z+1).multiply(0.5);
+    static Vector3 rayColor(Ray r, Hittable world) {
+        HitRecord record = new HitRecord();
+        if(world.hit(r, 0, Double.POSITIVE_INFINITY, record)){
+            return record.normal.add(new Vector3(1, 1, 1)).multiply(0.5);
         }
-
 
         //Background sky
         Vector3 unitDirection = r.direction.unitVector();
-        t = 0.5*(unitDirection.y + 1.0);
+        double t = 0.5*(unitDirection.y + 1.0);
         return (new Vector3(1.0, 1.0, 1.0).multiply(1.0-t)).add(new Vector3(0.5, 0.7, 1.0).multiply(t));
     }
 
 
     public static void main(String[] args) {
+
+        //File output
+        String fileName = "render.ppm";
+        String path = "C:\\Users\\dldemo\\Desktop\\Renders\\";
+
+
+        //Image
+        int imageWidth = 600;
+        int imageHeight = 400;
+
+        //world
+        HittableList world = new HittableList();
+        world.add(new Sphere(new Vector3(0, 0, -1), 0.5));
+        world.add(new Sphere(new Vector3(0, -100.5, -1), 100));
+
         //camera
+        double focalLength = 1.0;
+        double veiwportHeight = 2.0;
+        double veiwPortWidth = veiwportHeight * (((double)imageWidth) / ((double)imageHeight));
         Vector3 origin = new Vector3(0,0,0);
         Vector3 horizontal = new Vector3(veiwPortWidth, 0, 0);
         Vector3 vertical = new Vector3(0, veiwportHeight, 0);
         Vector3 lowerLeftCorner = origin.subtract(horizontal.divide(2))
                                         .subtract(vertical.divide(2))
                                         .subtract(new Vector3(0, 0, focalLength));
+
 
         //write To file
         try {
@@ -72,7 +65,7 @@ public class Main {
                                                             .add(vertical.multiply(v))
                                                             .subtract(origin));
 
-                    Vector3 pixelColor = rayColor(r);
+                    Vector3 pixelColor = rayColor(r, world);
 
                     writer.write(pixelColor.color() + "\n");
                 }
