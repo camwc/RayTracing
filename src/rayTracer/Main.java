@@ -17,9 +17,18 @@ public class Main {
         HitRecord record = new HitRecord();
 
         if(world.hit(r, 0.001, Double.POSITIVE_INFINITY, record)){
+            Ray scattered = new Ray(new Vector3(0,0,0), new Vector3(0,0,0));
+            Vector3 attenuation = new Vector3(0, 0, 0);
+            if(record.material.scatter(r, record, attenuation, scattered)){
+                return attenuation.multiply(rayColor(scattered, world, depth-1));
+            }
+            return new Vector3(0,0,0);
+            /*
             Vector3 target = record.point.add(record.normal).add(Vector3.randomUnitVector());
             return rayColor(new Ray(record.point, target.subtract(record.point)), world, depth-1).multiply(0.5);
-            //return record.normal.add(new Vector3(1, 1, 1)).multiply(0.5);
+            return record.normal.add(new Vector3(1, 1, 1)).multiply(0.5);
+
+             */
         }
 
         //Background sky
@@ -56,9 +65,16 @@ public class Main {
 
         //world
         HittableList world = new HittableList();
-        world.add(new Sphere(new Vector3(0, 0, -1), 0.5));
-        world.add(new Sphere(new Vector3(0, -100.5, -1), 100));
 
+        Material mGround = new Lambertian(new Vector3(0.8, 0.8, 0));
+        Material mCenter = new Lambertian(new Vector3(0.7, 0.3, 0.3));
+        Material mLeft = new Metal(new Vector3(0.8, 0.8, 0.8));
+        Material mRight = new Metal(new Vector3(0.8, 0.6, 0.2));
+
+        world.add(new Sphere(new Vector3(0, -100.5, -1), 100, mGround));
+        world.add(new Sphere(new Vector3(0, 0, -1), 0.5, mCenter));
+        world.add(new Sphere(new Vector3(-1, 0, -1), 0.5, mLeft));
+        world.add(new Sphere(new Vector3(1, 0, -1), 0.5, mRight));
 
         //camera
         Camera cam = new Camera(imageWidth, imageHeight);

@@ -12,4 +12,8 @@ public class Ray {
         return origin.add(direction.multiply(t));
     }
 
+    public void changeValues(Vector3 origin, Vector3 direction){
+        this.origin = origin;
+        this.direction = direction;
+    }
 }

@@ -5,9 +5,10 @@ public class Sphere extends Hittable {
     Vector3 center;
     double radius;
 
-    public Sphere(Vector3 center, double radius) {
+    public Sphere(Vector3 center, double radius, Material m) {
         this.center = center;
         this.radius = radius;
+        this.material = m;
     }
 
     @Override
@@ -38,6 +39,7 @@ public class Sphere extends Hittable {
         record.point = r.at(record.t);
         Vector3 outwardNormal = record.point.subtract(center).divide(radius);
         record.setFaceNormal(r, outwardNormal);
+        record.material = this.material;
 
         return true;
     }

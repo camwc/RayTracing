@@ -5,6 +5,7 @@ public class HitRecord{
     Vector3 normal;
     double t;
     boolean frontFace;
+    Material material;
 
     public HitRecord(){};
 

@@ -21,6 +21,10 @@ public class Vector3 {
         return new Vector3(this.x*t,this.y*t,this.z*t);
     }
 
+    public Vector3 multiply(Vector3 v){
+        return new Vector3(this.x*v.x, this.y*v.x, this.z*v.z);
+    }
+
     public Vector3 divide(double t){
         return this.multiply(1/t);
     }
@@ -61,6 +65,21 @@ public class Vector3 {
 
     public static Vector3 randomUnitVector(){
         return randomInUnitSphere().unitVector();
+    }
+
+    public Vector3 reflect(Vector3 normal){
+        return this.subtract(normal.multiply(this.dot(normal)*2));
+    }
+
+    public boolean nearZero(){
+        double s = 1e-8;
+        return (Math.abs(x) < s) && (Math.abs(y) < s) && (Math.abs(z) < s);
+    }
+
+    public void changeValues(Vector3 v){
+        this.x = v.x;
+        this.y = v.y;
+        this.z = v.z;
     }
 
     public String toString(){
