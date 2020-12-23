@@ -45,6 +45,24 @@ public class Vector3 {
         return new Vector3(this.y*v.z - this.z*v.y, this.z*v.x - this.x*v.z, this.x*v.y - this.y*v.x);
     }
 
+    public static Vector3 random(double min, double max){
+        return new Vector3(min + (max-min) * Math.random(), min + (max-min) * Math.random(), min + (max-min) * Math.random());
+    }
+
+    public static Vector3 randomInUnitSphere(){
+        while(true){
+            Vector3 v = random(-1, 1);
+            if(v.lengthSquared() >= 1){
+                    continue;
+            }
+            return v;
+        }
+    }
+
+    public static Vector3 randomUnitVector(){
+        return randomInUnitSphere().unitVector();
+    }
+
     public String toString(){
         return x + ", " + y + ", " + z;
     }

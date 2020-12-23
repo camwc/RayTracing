@@ -6,16 +6,38 @@ import java.io.IOException;
 public class Main {
 
     //Color of rays cast
-    static Vector3 rayColor(Ray r, Hittable world) {
+    static Vector3 rayColor(Ray r, Hittable world, int depth) {
+        //Checks depth
+        if(depth <= 0){
+            return new Vector3(0, 0, 0);
+        }
+
+
+        //Stores running record of hitdata
         HitRecord record = new HitRecord();
-        if(world.hit(r, 0, Double.POSITIVE_INFINITY, record)){
-            return record.normal.add(new Vector3(1, 1, 1)).multiply(0.5);
+
+        if(world.hit(r, 0.001, Double.POSITIVE_INFINITY, record)){
+            Vector3 target = record.point.add(record.normal).add(Vector3.randomUnitVector());
+            return rayColor(new Ray(record.point, target.subtract(record.point)), world, depth-1).multiply(0.5);
+            //return record.normal.add(new Vector3(1, 1, 1)).multiply(0.5);
         }
 
         //Background sky
         Vector3 unitDirection = r.direction.unitVector();
         double t = 0.5*(unitDirection.y + 1.0);
         return (new Vector3(1.0, 1.0, 1.0).multiply(1.0-t)).add(new Vector3(0.5, 0.7, 1.0).multiply(t));
+    }
+
+    static String writeColor(Vector3 pixelColor, int samplesPerPixel){
+        //Correct for multiple samples
+        double scale = 1.0/samplesPerPixel;
+        pixelColor = pixelColor.multiply(scale);
+
+        //Correct for gamma
+        pixelColor.x = Math.sqrt(pixelColor.x);
+        pixelColor.y = Math.sqrt(pixelColor.y);
+        pixelColor.z = Math.sqrt(pixelColor.z);
+        return pixelColor.color();
     }
 
 
@@ -29,23 +51,17 @@ public class Main {
         //Image
         int imageWidth = 600;
         int imageHeight = 400;
+        int samplesPerPixel = 100;
+        int maxDepth = 50;
 
         //world
         HittableList world = new HittableList();
         world.add(new Sphere(new Vector3(0, 0, -1), 0.5));
         world.add(new Sphere(new Vector3(0, -100.5, -1), 100));
 
-        //camera
-        double focalLength = 1.0;
-        double veiwportHeight = 2.0;
-        double veiwPortWidth = veiwportHeight * (((double)imageWidth) / ((double)imageHeight));
-        Vector3 origin = new Vector3(0,0,0);
-        Vector3 horizontal = new Vector3(veiwPortWidth, 0, 0);
-        Vector3 vertical = new Vector3(0, veiwportHeight, 0);
-        Vector3 lowerLeftCorner = origin.subtract(horizontal.divide(2))
-                                        .subtract(vertical.divide(2))
-                                        .subtract(new Vector3(0, 0, focalLength));
 
+        //camera
+        Camera cam = new Camera(imageWidth, imageHeight);
 
         //write To file
         try {
@@ -57,17 +73,18 @@ public class Main {
 
             //Render image
             for(int y = imageHeight-1; y >= 0; y--){
+                System.out.println("Scanlines remaining: " + y);
                 for(int x = 0; x < imageWidth; x++){
-                    double u = ((double)x) / (imageWidth-1);
-                    double v = ((double)y) / (imageHeight-1);
+                    Vector3 pixelColor = new Vector3(0, 0, 0);
+                    for(int s = 0; s < samplesPerPixel; s++){
+                        double u = ((double)x+Math.random()) / (imageWidth-1);
+                        double v = ((double)y+Math.random()) / (imageHeight-1);
 
-                    Ray r = new Ray(origin, lowerLeftCorner.add(horizontal.multiply(u))
-                                                            .add(vertical.multiply(v))
-                                                            .subtract(origin));
+                        Ray r = cam.getRay(u, v);
 
-                    Vector3 pixelColor = rayColor(r, world);
-
-                    writer.write(pixelColor.color() + "\n");
+                        pixelColor = pixelColor.add(rayColor(r, world, maxDepth));
+                    }
+                    writer.write(writeColor(pixelColor, samplesPerPixel) + "\n");
                 }
             }
 
@@ -78,6 +95,7 @@ public class Main {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
+
 
     }
 }
