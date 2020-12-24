@@ -71,6 +71,15 @@ public class Vector3 {
         return this.subtract(normal.multiply(this.dot(normal)*2));
     }
 
+    public Vector3 refract(Vector3 normal, double etaiOverEtat){
+        double cosTheta = Math.min(this.multiply(-1).dot(normal), 1);
+        double sinTheta;
+
+        Vector3 rOutPerpendicular = normal.multiply(cosTheta).add(this).multiply(etaiOverEtat);
+        Vector3 rOutParallel = normal.multiply(-Math.sqrt(Math.abs(1 - rOutPerpendicular.lengthSquared())));
+        return rOutPerpendicular.add(rOutParallel);
+    }
+
     public boolean nearZero(){
         double s = 1e-8;
         return (Math.abs(x) < s) && (Math.abs(y) < s) && (Math.abs(z) < s);

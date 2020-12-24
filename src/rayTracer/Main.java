@@ -67,9 +67,9 @@ public class Main {
         HittableList world = new HittableList();
 
         Material mGround = new Lambertian(new Vector3(0.8, 0.8, 0));
-        Material mCenter = new Lambertian(new Vector3(0.7, 0.3, 0.3));
-        Material mLeft = new Metal(new Vector3(0.8, 0.8, 0.8));
-        Material mRight = new Metal(new Vector3(0.8, 0.6, 0.2));
+        Material mCenter = new Lambertian(new Vector3(0.1, 0.2, 0.5));
+        Material mLeft = new Metal(new Vector3(0.8, 0.6, 0.2), 0);
+        Material mRight = new Dielectric(1.5);
 
         world.add(new Sphere(new Vector3(0, -100.5, -1), 100, mGround));
         world.add(new Sphere(new Vector3(0, 0, -1), 0.5, mCenter));
