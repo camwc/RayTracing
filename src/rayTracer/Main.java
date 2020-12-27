@@ -77,7 +77,13 @@ public class Main {
         world.add(new Sphere(new Vector3(1, 0, -1), 0.5, mRight));
 
         //camera
-        Camera cam = new Camera(imageWidth, imageHeight);
+        Vector3 cameraPos = new Vector3(2,2,1);
+        Vector3 lookAt = new Vector3(0, 0, -1);
+        Vector3 up = new Vector3(0, 1, 0);
+        double distFocus = cameraPos.subtract(lookAt).length();
+        double aperture = 0;
+
+        Camera cam = new Camera(cameraPos, lookAt, up, 30, imageWidth, imageHeight, aperture, distFocus);
 
         //write To file
         try {

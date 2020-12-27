@@ -67,6 +67,17 @@ public class Vector3 {
         return randomInUnitSphere().unitVector();
     }
 
+    public static Vector3 randomInUnitDisc(){
+        while(true){
+            Vector3 p = random(-1, 1);
+            p.z = 0;
+            if(p.lengthSquared() >= 1){
+                continue;
+            }
+            return p;
+        }
+    }
+
     public Vector3 reflect(Vector3 normal){
         return this.subtract(normal.multiply(this.dot(normal)*2));
     }
