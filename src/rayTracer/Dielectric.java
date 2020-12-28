@@ -9,6 +9,11 @@ public class Dielectric extends Material {
         this.albedo = new Vector3(1,1,1);
     }
 
+    public Dielectric(Vector3 albedo, double indexOfRefraction){
+        this.indexOfRefraction = indexOfRefraction;
+        this.albedo = albedo;
+    }
+
     @Override
     boolean scatter(Ray rIn, HitRecord record, Vector3 attenuation, Ray scattered) {
         attenuation.changeValues(albedo);

@@ -7,11 +7,10 @@ public class Main {
 
     //Color of rays cast
     static Vector3 rayColor(Ray r, Hittable world, int depth) {
-        //Checks depth
+        //Checks bounce depth
         if(depth <= 0){
             return new Vector3(0, 0, 0);
         }
-
 
         //Stores running record of hitdata
         HitRecord record = new HitRecord();
@@ -19,16 +18,14 @@ public class Main {
         if(world.hit(r, 0.001, Double.POSITIVE_INFINITY, record)){
             Ray scattered = new Ray(new Vector3(0,0,0), new Vector3(0,0,0));
             Vector3 attenuation = new Vector3(0, 0, 0);
+
             if(record.material.scatter(r, record, attenuation, scattered)){
+                //Recursively bounces ray
                 return attenuation.multiply(rayColor(scattered, world, depth-1));
             }
-            return new Vector3(0,0,0);
-            /*
-            Vector3 target = record.point.add(record.normal).add(Vector3.randomUnitVector());
-            return rayColor(new Ray(record.point, target.subtract(record.point)), world, depth-1).multiply(0.5);
-            return record.normal.add(new Vector3(1, 1, 1)).multiply(0.5);
 
-             */
+            //Returns black if Ray absorbed
+            return new Vector3(0,0,0);
         }
 
         //Background sky
@@ -37,7 +34,7 @@ public class Main {
         return (new Vector3(1.0, 1.0, 1.0).multiply(1.0-t)).add(new Vector3(0.5, 0.7, 1.0).multiply(t));
     }
 
-    static String writeColor(Vector3 pixelColor, int samplesPerPixel){
+    static Vector3 adjustColor(Vector3 pixelColor, int samplesPerPixel){
         //Correct for multiple samples
         double scale = 1.0/samplesPerPixel;
         pixelColor = pixelColor.multiply(scale);
@@ -46,7 +43,31 @@ public class Main {
         pixelColor.x = Math.sqrt(pixelColor.x);
         pixelColor.y = Math.sqrt(pixelColor.y);
         pixelColor.z = Math.sqrt(pixelColor.z);
-        return pixelColor.color();
+        return pixelColor;
+    }
+
+    static void writePPM(Vector3[] pixelArray, int imageHeight,int imageWidth, String path, String fileName) throws ArrayIndexOutOfBoundsException{
+        if(pixelArray.length != imageHeight*imageWidth){
+            throw new ArrayIndexOutOfBoundsException("pixel Array is not the correct length for the given resolution");
+        }
+
+        try {
+            FileWriter writer = new FileWriter(path+fileName);
+
+            //Header
+            writer.write("P3\n"+imageWidth+" "+imageHeight+"\n"+255+"\n");
+
+            for(int i = 0; i < pixelArray.length; i++){
+                writer.write(pixelArray[i].color() + "\n");
+            }
+
+            writer.close();
+            System.out.println("Successfully wrote to the file.");
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+
     }
 
 
@@ -85,39 +106,69 @@ public class Main {
 
         Camera cam = new Camera(cameraPos, lookAt, up, 30, imageWidth, imageHeight, aperture, distFocus);
 
-        //write To file
-        try {
-            FileWriter writer = new FileWriter(path+fileName);
+        //render image
+        Vector3[] pixelArray = new Vector3[imageWidth*imageHeight];
 
-            //Header
-            writer.write("P3\n"+imageWidth+" "+imageHeight+"\n"+255+"\n");
+        int numOfThreads = 1;
 
+        int availableProcessors = Runtime.getRuntime().availableProcessors();
+        numOfThreads = Math.min(numOfThreads, availableProcessors);
 
-            //Render image
-            for(int y = imageHeight-1; y >= 0; y--){
-                System.out.println("Scanlines remaining: " + y);
-                for(int x = 0; x < imageWidth; x++){
-                    Vector3 pixelColor = new Vector3(0, 0, 0);
-                    for(int s = 0; s < samplesPerPixel; s++){
-                        double u = ((double)x+Math.random()) / (imageWidth-1);
-                        double v = ((double)y+Math.random()) / (imageHeight-1);
+        Thread[] threads = new Thread[numOfThreads];
 
-                        Ray r = cam.getRay(u, v);
+        Long startTime = System.currentTimeMillis();
 
-                        pixelColor = pixelColor.add(rayColor(r, world, maxDepth));
-                    }
-                    writer.write(writeColor(pixelColor, samplesPerPixel) + "\n");
-                }
+        int stepSize = imageHeight/numOfThreads;
+        int remainder = imageHeight%numOfThreads;
+        for(int i = 0; i < numOfThreads; i++){
+
+            int startScanLine = imageHeight - stepSize*i;
+            int endScanLine = startScanLine - stepSize;
+            if(i == numOfThreads - 1){
+                endScanLine -= remainder;
             }
 
+            Renderer r = new Renderer(pixelArray, cam, world, imageHeight, imageWidth, samplesPerPixel, maxDepth, startScanLine, endScanLine);
+            threads[i] = new Thread(r, ""+i);
 
-            writer.close();
-            System.out.println("Successfully wrote to the file.");
-        } catch (IOException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
+            threads[i].start();
         }
 
+        for(int i = 0; i < numOfThreads; i++){
+            try {
+                threads[i].join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        /*
+        Vector3[] pixelArray = new Vector3[imageWidth*imageHeight];
+        for(int y = imageHeight-1; y >= 0; y--){
+            System.out.println("Scanlines remaining: " + y);
+            for(int x = 0; x < imageWidth; x++){
+                Vector3 pixelColor = new Vector3(0, 0, 0);
+                for(int s = 0; s < samplesPerPixel; s++){
+                    double u = ((double)x+Math.random()) / (imageWidth-1);
+                    double v = ((double)y+Math.random()) / (imageHeight-1);
+
+                    Ray r = cam.getRay(u, v);
+
+                    pixelColor = pixelColor.add(rayColor(r, world, maxDepth));
+                }
+
+                pixelArray[imageWidth*(-y+imageHeight-1)+x] = adjustColor(pixelColor, samplesPerPixel);
+            }
+        }
+        */
+
+
+
+        //write To file
+        writePPM(pixelArray, imageHeight, imageWidth, path, fileName);
+
+        System.out.println("Rendered in " + (System.currentTimeMillis()-startTime) + " milliseconds");
 
     }
 }

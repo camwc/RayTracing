@@ -15,6 +15,6 @@ public class Metal extends Material{
 
         scattered.changeValues(record.point, reflected.add(Vector3.randomInUnitSphere().multiply(fuzz)));
         attenuation.changeValues(albedo);
-            return scattered.direction.dot(record.normal) > 0;
+        return scattered.direction.dot(record.normal) > 0;
     }
 }
