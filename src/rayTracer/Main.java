@@ -3,6 +3,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+
+//TIME TO BEAT 18.02 seconds AVG
 public class Main {
 
     //Color of rays cast
