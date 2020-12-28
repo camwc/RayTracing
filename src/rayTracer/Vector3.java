@@ -22,7 +22,7 @@ public class Vector3 {
     }
 
     public Vector3 multiply(Vector3 v){
-        return new Vector3(this.x*v.x, this.y*v.x, this.z*v.z);
+        return new Vector3(this.x*v.x, this.y*v.y, this.z*v.z);
     }
 
     public Vector3 divide(double t){

@@ -4,6 +4,54 @@ import java.io.IOException;
 
 public class Main {
 
+    static HittableList randomScene(){
+        HittableList world = new HittableList();
+
+        Material groundMaterial = new Lambertian(new Vector3(0.5, 0.5, 0.5));
+        world.add(new Sphere(new Vector3(0, -1000, 0), 1000, groundMaterial));
+
+        for(int a = -11; a < 11; a++){
+            for(int b = -11; b < 11; b++){
+                double choose = Math.random();
+                Vector3 center = new Vector3(a + 0.9*Math.random(), 0.2, b + 0.9*Math.random());
+
+                if(center.subtract(new Vector3(4, 0.2, 0)).length() > 0.9){
+                    Material sphereMaterial;
+
+                    if(choose < 0.8){
+                        //diffuse
+                        Vector3 albedo = Vector3.random(0,0.9).multiply(Vector3.random(0,0.9));
+                        sphereMaterial = new Lambertian(albedo);
+                    }
+                    else if(choose < 0.95){
+                        //metal
+                        Vector3 albedo = Vector3.random(0.5, 1);
+                        double fuzz = Math.random()*0.5;
+                        sphereMaterial = new Metal(albedo, fuzz);
+                    }
+                    else{
+                        //glass
+                        sphereMaterial = new Dielectric(1.5);
+                    }
+
+                    world.add(new Sphere(center, 0.2, sphereMaterial));
+                }
+            }
+        }
+
+        Material mat1 = new Dielectric(1.5);
+        world.add(new Sphere(new Vector3(0, 1, 0), 1, mat1));
+
+        Material mat2 = new Lambertian(new Vector3(0.4, 0.2, 0.1));
+        world.add(new Sphere(new Vector3(-4, 1, 0), 1, mat2));
+
+        Material mat3 = new Metal(new Vector3(0.7, 0.6, 0.5), 0);
+        world.add(new Sphere(new Vector3(4, 1, 0), 1, mat3));
+
+        return world;
+
+    }
+
     //Color of rays cast
     static Vector3 rayColor(Ray r, Hittable world, int depth) {
         //Checks depth
@@ -58,26 +106,17 @@ public class Main {
         int maxDepth = 50;
 
         //world
-        HittableList world = new HittableList();
+        HittableList world = randomScene();
 
-        Material mGround = new Lambertian(new Vector3(0.8, 0.8, 0));
-        Material mCenter = new Lambertian(new Vector3(0.1, 0.2, 0.5));
-        Material mLeft = new Metal(new Vector3(0.8, 0.6, 0.2), 0);
-        Material mRight = new Dielectric(1.5);
-
-        world.add(new Sphere(new Vector3(0, -100.5, -1), 100, mGround));
-        world.add(new Sphere(new Vector3(0, 0, -1), 0.5, mCenter));
-        world.add(new Sphere(new Vector3(-1, 0, -1), 0.5, mLeft));
-        world.add(new Sphere(new Vector3(1, 0, -1), 0.5, mRight));
 
         //camera
-        Vector3 cameraPos = new Vector3(2,2,1);
-        Vector3 lookAt = new Vector3(0, 0, -1);
+        Vector3 cameraPos = new Vector3(13,2,3);
+        Vector3 lookAt = new Vector3(0, 0, 0);
         Vector3 up = new Vector3(0, 1, 0);
-        double distFocus = cameraPos.subtract(lookAt).length();
-        double aperture = 0;
+        double distFocus = 10;
+        double aperture = 0.1;
 
-        Camera cam = new Camera(cameraPos, lookAt, up, 30, imageWidth, imageHeight, aperture, distFocus);
+        Camera cam = new Camera(cameraPos, lookAt, up, 20, imageWidth, imageHeight, aperture, distFocus);
 
         long startTime = System.currentTimeMillis();
 
