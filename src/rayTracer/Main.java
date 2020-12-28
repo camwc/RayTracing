@@ -1,5 +1,4 @@
 package rayTracer;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -23,12 +22,7 @@ public class Main {
                 return attenuation.multiply(rayColor(scattered, world, depth-1));
             }
             return new Vector3(0,0,0);
-            /*
-            Vector3 target = record.point.add(record.normal).add(Vector3.randomUnitVector());
-            return rayColor(new Ray(record.point, target.subtract(record.point)), world, depth-1).multiply(0.5);
-            return record.normal.add(new Vector3(1, 1, 1)).multiply(0.5);
 
-             */
         }
 
         //Background sky
@@ -85,6 +79,8 @@ public class Main {
 
         Camera cam = new Camera(cameraPos, lookAt, up, 30, imageWidth, imageHeight, aperture, distFocus);
 
+        long startTime = System.currentTimeMillis();
+
         //write To file
         try {
             FileWriter writer = new FileWriter(path+fileName);
@@ -118,6 +114,7 @@ public class Main {
             e.printStackTrace();
         }
 
+        System.out.println("Rendered in " + (System.currentTimeMillis()-startTime) + " milliseconds");
 
     }
 }
