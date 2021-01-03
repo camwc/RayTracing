@@ -2,11 +2,16 @@ package rayTracer;
 
 public class Vector3 {
     double x,y,z;
+    double[] e;
 
     public Vector3(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
+        e = new double[3];
+        e[0] = x;
+        e[1] = y;
+        e[2] = z;
     }
 
     public Vector3 add(Vector3 v){

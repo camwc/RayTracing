@@ -34,4 +34,26 @@ public class HittableList extends Hittable {
 
         return hitAnything;
     }
+
+    @Override
+    boolean boundingBox(AABB outputBox) {
+        if(objects.isEmpty()){
+            return false;
+        }
+
+        AABB tempBox = new AABB();
+        AABB outputTemp = outputBox;
+        boolean firstBox = true;
+
+        for(Hittable object : objects){
+            if(!object.boundingBox(tempBox)){
+                return false;
+            }
+            outputTemp = firstBox ? tempBox : AABB.surroundingBox(outputTemp, tempBox);
+            firstBox = false;
+        }
+        outputBox.changeValues(outputTemp);
+
+        return true;
+    }
 }

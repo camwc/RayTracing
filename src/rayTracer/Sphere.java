@@ -43,4 +43,13 @@ public class Sphere extends Hittable {
 
         return true;
     }
+
+    @Override
+    boolean boundingBox(AABB outputBox) {
+        Vector3 v = new Vector3(radius, radius, radius);
+        outputBox.minimum = center.subtract(v);
+        outputBox.maximum = center.add(v);
+
+        return true;
+    }
 }

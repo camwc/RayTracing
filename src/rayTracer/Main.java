@@ -4,7 +4,7 @@ import java.io.IOException;
 
 public class Main {
 
-    static HittableList randomScene(){
+    static BVHNode randomScene(){
         HittableList world = new HittableList();
 
         Material groundMaterial = new Lambertian(new Vector3(0.5, 0.5, 0.5));
@@ -48,7 +48,7 @@ public class Main {
         Material mat3 = new Metal(new Vector3(0.7, 0.6, 0.5), 0);
         world.add(new Sphere(new Vector3(4, 1, 0), 1, mat3));
 
-        return world;
+        return new BVHNode(world);
 
     }
 
@@ -106,7 +106,7 @@ public class Main {
         int maxDepth = 50;
 
         //world
-        HittableList world = randomScene();
+        BVHNode world = randomScene();
 
 
         //camera
