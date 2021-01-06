@@ -39,6 +39,7 @@ public class Sphere extends Hittable {
         record.point = r.at(record.t);
         Vector3 outwardNormal = record.point.subtract(center).divide(radius);
         record.setFaceNormal(r, outwardNormal);
+        getSphereUV(record);
         record.material = this.material;
 
         return true;
@@ -51,5 +52,15 @@ public class Sphere extends Hittable {
         outputBox.maximum = center.add(v);
 
         return true;
+    }
+
+    public void getSphereUV(HitRecord rec){
+
+        //Very inefficient;
+        double theta = Math.acos(-rec.point.y);
+        double phi = Math.atan2(-rec.point.z, rec.point.x) + Math.PI;
+
+        rec.u = phi / (2*Math.PI);
+        rec.v = theta / Math.PI;
     }
 }

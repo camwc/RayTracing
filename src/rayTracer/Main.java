@@ -4,10 +4,11 @@ import java.io.IOException;
 
 public class Main {
 
-    static BVHNode randomScene(){
+    static HittableList randomScene(){
         HittableList world = new HittableList();
 
-        Material groundMaterial = new Lambertian(new Vector3(0.5, 0.5, 0.5));
+        Texture checker = new CheckerTexture(new Vector3(0.2, 0.3, 0.1), new Vector3(0.9, 0.9, 0.9));
+        Material groundMaterial = new Lambertian(checker);
         world.add(new Sphere(new Vector3(0, -1000, 0), 1000, groundMaterial));
 
         for(int a = -11; a < 11; a++){
@@ -39,7 +40,7 @@ public class Main {
             }
         }
 
-        Material mat1 = new Dielectric(1.5);
+        Material mat1 = new Dielectric(new Vector3(0.8, 0.8, 0.8),1.5);
         world.add(new Sphere(new Vector3(0, 1, 0), 1, mat1));
 
         Material mat2 = new Lambertian(new Vector3(0.4, 0.2, 0.1));
@@ -48,7 +49,7 @@ public class Main {
         Material mat3 = new Metal(new Vector3(0.7, 0.6, 0.5), 0);
         world.add(new Sphere(new Vector3(4, 1, 0), 1, mat3));
 
-        return new BVHNode(world);
+        return world;
 
     }
 
@@ -106,7 +107,20 @@ public class Main {
         int maxDepth = 50;
 
         //world
-        BVHNode world = randomScene();
+        int scene = 1;
+        HittableList worldList = new HittableList();
+
+        switch (scene){
+            case 0:
+                worldList = randomScene();
+            default:
+            case 1:
+                Material groundMaterial = new Lambertian(new NoiseTexture());
+                worldList.add(new Sphere(new Vector3(0, -1000, 0), 1000, groundMaterial));
+                worldList.add(new Sphere(new Vector3(0, 1, 0), 1, groundMaterial));
+        }
+
+        BVHNode world = new BVHNode(worldList);
 
 
         //camera

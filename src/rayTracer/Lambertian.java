@@ -1,9 +1,14 @@
 package rayTracer;
 
 public class Lambertian extends Material {
-    Vector3 albedo;
+    //Vector3 albedo;
+    Texture albedo;
 
     public Lambertian(Vector3 albedo){
+        this.albedo = new SolidColor(albedo);
+    }
+
+    public Lambertian(Texture albedo){
         this.albedo = albedo;
     }
 
@@ -16,7 +21,7 @@ public class Lambertian extends Material {
         }
 
         scattered.changeValues(record.point, scatterDirection);
-        attenuation.changeValues(albedo);
+        attenuation.changeValues(albedo.colorValue(record.u, record.v, record.point));
         return true;
     }
 }
