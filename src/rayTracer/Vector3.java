@@ -55,7 +55,7 @@ public class Vector3 {
     }
 
     public static Vector3 random(double min, double max){
-        return new Vector3(min + (max-min) * Math.random(), min + (max-min) * Math.random(), min + (max-min) * Math.random());
+        return new Vector3(Utility.getRandDouble(min, max), Utility.getRandDouble(min, max), Utility.getRandDouble(min, max));
     }
 
     public static Vector3 randomInUnitSphere(){

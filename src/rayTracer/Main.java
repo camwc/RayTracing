@@ -113,11 +113,13 @@ public class Main {
         switch (scene){
             case 0:
                 worldList = randomScene();
+                break;
             default:
             case 1:
-                Material groundMaterial = new Lambertian(new NoiseTexture());
+                Material groundMaterial = new Lambertian(new NoiseTexture(4));
                 worldList.add(new Sphere(new Vector3(0, -1000, 0), 1000, groundMaterial));
-                worldList.add(new Sphere(new Vector3(0, 1, 0), 1, groundMaterial));
+                worldList.add(new Sphere(new Vector3(0, 2, 0), 2, groundMaterial));
+                break;
         }
 
         BVHNode world = new BVHNode(worldList);

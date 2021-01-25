@@ -57,9 +57,8 @@ public class Sphere extends Hittable {
     public void getSphereUV(HitRecord rec){
 
         //Very inefficient;
-        double theta = Math.acos(-rec.point.y);
-        double phi = Math.atan2(-rec.point.z, rec.point.x) + Math.PI;
-
+        double theta = Utility.acos(-rec.point.y);
+        double phi = Utility.atan2(-rec.point.z, rec.point.x) + Math.PI;
         rec.u = phi / (2*Math.PI);
         rec.v = theta / Math.PI;
     }

@@ -17,7 +17,7 @@ public class BVHNode extends Hittable{
     public BVHNode(ArrayList<Hittable> objects, int start, int end){
         ArrayList srcObjects = objects;
 
-        int axis = (int)((Math.random()*3));
+        int axis = Utility.getRandInt(0,2);
         Comparator<Hittable> comparator = new boxCompare(axis);
 
         int objectSpan = end - start;
