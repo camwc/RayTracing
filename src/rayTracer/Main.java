@@ -97,17 +97,17 @@ public class Main {
 
         //File output
         String fileName = "render.ppm";
-        String path = "C:\\Users\\dldemo\\Desktop\\Renders\\";
+        String path = "C:\\Users\\camwc\\Desktop\\";
 
 
         //Image
-        int imageWidth = 600;
-        int imageHeight = 400;
-        int samplesPerPixel = 100;
+        int imageWidth = 1200;
+        int imageHeight = 1000;
+        int samplesPerPixel = 200;
         int maxDepth = 50;
 
         //world
-        int scene = 1;
+        int scene = 0;
         HittableList worldList = new HittableList();
 
         switch (scene){
