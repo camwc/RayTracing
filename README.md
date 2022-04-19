@@ -11,5 +11,5 @@ Writes .ppm files
 
 I used https://raytracing.github.io/books/RayTracingInOneWeekend.html and https://raytracing.github.io/books/RayTracingTheNextWeek.html as a reference
 
-![alt text](https://github.com/camwc/RayTracing/render.png)
+![alt text](https://github.com/camwc/RayTracing/blob/master/render.png)
 ##### An example render
